@@ -121,16 +121,16 @@ ARGV.each do |srcpath|
 		unless conf.moving
 			unless conf.dry_run
 				FileUtils.cp(srcpath, dstpath, {:preserve => true})
-				puts "#{srcpath}\tcopied to #{dstpath}"
+				$stderr.puts "#{srcpath}\tcopied to #{dstpath}"
 			else
-				puts "#{srcpath}\tpretending to copy to #{dstpath}"
+				$stderr.puts "#{srcpath}\tpretending to copy to #{dstpath}"
 			end
 		else
 			unless conf.dry_run
 				FileUtils.mv(srcpath, dstpath)
-				puts "#{srcpath}\tmoved to #{dstpath}"
+				$stderr.puts "#{srcpath}\tmoved to #{dstpath}"
 			else
-				puts "#{srcpath}\tpretending to move to #{dstpath}"
+				$stderr.puts "#{srcpath}\tpretending to move to #{dstpath}"
 			end
 		end
 
