@@ -110,7 +110,7 @@ ARGV.each do |srcpath|
 		unless conf.dry_run
 			FileUtils.cp(srcpath, dstpath, {:preserve => true})
 		else
-			puts "#{srcpath}\t pretending to copy to #{dstpath}"
+			puts "#{srcpath}\tpretending to copy to #{dstpath}"
 		end
 
 	rescue => evar
