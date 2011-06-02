@@ -1,0 +1,4 @@
+usage: ruby organize-photos.rb dst-directory-format path [path ...]
+
+moves photos at paths to dst-diectory formated through strftime
+with date and time of each photo
