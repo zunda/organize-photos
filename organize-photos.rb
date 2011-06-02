@@ -115,6 +115,7 @@ ARGV.each do |srcpath|
 		# Move the file
 		unless conf.dry_run
 			FileUtils.cp(srcpath, dstpath, {:preserve => true})
+			puts "#{srcpath}\tcopied to #{dstpath}"
 		else
 			puts "#{srcpath}\tpretending to copy to #{dstpath}"
 		end
