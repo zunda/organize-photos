@@ -2,14 +2,20 @@
 #
 # usage: ruby organize-photos.rb dst-directory-format path [path ...]
 #
-# example for dry run:
+# moves photos at paths to dst-diectory formated through strftime
+# with date and time of each photo
+#
+# example for a dry run:
 #	find /backup1/tmp -type f -print0 | sort -z |\
 #	xargs -0 ruby ~/organize-photos/organize-photos.rb \
 #	-n /backup1/Archive/Photo/Photo%y/%y%m 2>&1 |\
 #	tee organize-photos.`date +%Y%m%d`.log
 #
-# moves photos at paths to dst-diectory formated through strftime
-# with date and time of each photo
+# Copyright (C) 2011 by zunda <zunda at freeshell.org>
+#
+# Permission is granted for use, copying, modification, distribution,
+# and distribution of modified versions of this work as long as the
+# above copyright notice is included.
 #
 
 require 'exif'
@@ -33,7 +39,7 @@ class Dir
 end
 
 class Image
-	DateTag = 'Date and Time (original)'
+	DateTag = 'Date and Time (original)'	# in EXIF
 	attr_reader :time
 
 	def initialize(path)
@@ -55,6 +61,7 @@ class Image
 		# then from filename with format yyyy-mm-dd-hh-mm-ss
 		a = basename.scan(/\d+/)
 		ts << a[0..5] if a and 6 <= a.size
+		# Try to parse time from the candidates
 		ts.each do |timeary|
 			begin
 				@time = Time.local(*timeary)
@@ -63,8 +70,7 @@ class Image
 			end
 			break
 		end
-
-		# then from mtime
+		# or use mtime
 		unless @time
 			@time = File.mtime(path)
 		end
