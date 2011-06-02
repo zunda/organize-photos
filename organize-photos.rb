@@ -2,6 +2,12 @@
 #
 # usage: ruby organize-photos.rb dst-directory-format path [path ...]
 #
+# example for dry run:
+#	find /backup1/tmp -type f -print0 | sort -z |\
+#	xargs -0 ruby ~/organize-photos/organize-photos.rb \
+#	-n /backup1/Archive/Photo/Photo%y/%y%m 2>&1 |\
+#	tee organize-photos.`date +%Y%m%d`.log
+#
 # moves photos at paths to dst-diectory formated through strftime
 # with date and time of each photo
 #
