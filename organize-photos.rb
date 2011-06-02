@@ -16,18 +16,6 @@ require 'exif'
 require 'fileutils'
 require 'optparse'
 
-class Conf
-	attr_reader :dry_run
-	attr_reader :verbose
-	attr_writer :dry_run
-	attr_writer :verbose
-
-	def initialize
-		@dry_run = false
-		@verbose = true
-	end
-end
-
 class Dir
 	def Dir.paths(dirname)
 		r = Array.new
@@ -83,9 +71,20 @@ class Image
 	end
 end
 
+class Conf
+	attr_accessor :dry_run
+	attr_accessor :moving
+	def initialize
+		@dry_run = false
+		@moving = false
+	end
+end
+
 conf = Conf.new
 opt = OptionParser.new
+opt.banner = "usage: #{opt.program_name} [options] dst-directory-format file file..."
 opt.on('-n', 'makes a dry run'){conf.dry_run = true}
+opt.on('-m', 'moves the files instead of copying'){conf.moving = true}
 opt.parse!(ARGV)
 
 dstformat = ARGV.shift
@@ -112,12 +111,21 @@ ARGV.each do |srcpath|
 			raise "has similar file below #{dstdir}"
 		end
 
-		# Move the file
-		unless conf.dry_run
-			FileUtils.cp(srcpath, dstpath, {:preserve => true})
-			puts "#{srcpath}\tcopied to #{dstpath}"
+		# Move or copy the file
+		unless conf.moving
+			unless conf.dry_run
+				FileUtils.cp(srcpath, dstpath, {:preserve => true})
+				puts "#{srcpath}\tcopied to #{dstpath}"
+			else
+				puts "#{srcpath}\tpretending to copy to #{dstpath}"
+			end
 		else
-			puts "#{srcpath}\tpretending to copy to #{dstpath}"
+			unless conf.dry_run
+				FileUtils.mv(srcpath, dstpath)
+				puts "#{srcpath}\tmoved to #{dstpath}"
+			else
+				puts "#{srcpath}\tpretending to move to #{dstpath}"
+			end
 		end
 
 	rescue => evar
