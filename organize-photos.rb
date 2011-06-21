@@ -80,20 +80,22 @@ end
 class Conf
 	attr_accessor :dry_run
 	attr_accessor :moving
+	attr_accessor :dst_format
 	def initialize
 		@dry_run = false
 		@moving = false
+		@dst_format = '/backup1/Archive/Photo/Photo%y/%y%m'
 	end
 end
 
 conf = Conf.new
 opt = OptionParser.new
-opt.banner = "usage: #{opt.program_name} [options] dst-directory-format file file..."
+opt.banner = "usage: #{opt.program_name} [options] file file..."
 opt.on('-n', 'makes a dry run'){conf.dry_run = true}
 opt.on('-m', 'moves the files instead of copying'){conf.moving = true}
+opt.on('-d', "specifies format of destination, default: #{conf.dst_format}"){|x| conf.dst_format = x}
 opt.parse!(ARGV)
 
-dstformat = ARGV.shift
 error = false
 ARGV.each do |srcpath|
 	begin
@@ -105,7 +107,7 @@ ARGV.each do |srcpath|
 
 		# Create destination
 		srcname = File.basename(srcpath)
-		dstdir = image.time.strftime(dstformat)
+		dstdir = image.time.strftime(conf.dst_format)
 		dstpath = File.join(dstdir, srcname)
 		FileUtils.mkdir_p(dstdir)
 
