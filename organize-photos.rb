@@ -81,9 +81,11 @@ class Conf
 	attr_accessor :dry_run
 	attr_accessor :moving
 	attr_accessor :dst_format
+	attr_accessor :quiet
 	def initialize
 		@dry_run = false
 		@moving = false
+		@quiet = false
 		@dst_format = '/backup1/Archive/Photo/Photo%y/%y%m'
 	end
 end
@@ -94,6 +96,7 @@ opt.banner = "usage: #{opt.program_name} [options] file file..."
 opt.on('-n', 'makes a dry run'){conf.dry_run = true}
 opt.on('-m', 'moves the files instead of copying'){conf.moving = true}
 opt.on('-d', "specifies format of destination, default: #{conf.dst_format}"){|x| conf.dst_format = x}
+opt.on('-q', "supresses error messages"){conf.quiet = true}
 opt.parse!(ARGV)
 
 error = false
@@ -123,21 +126,21 @@ ARGV.each do |srcpath|
 		unless conf.moving
 			unless conf.dry_run
 				FileUtils.cp(srcpath, dstpath, {:preserve => true})
-				$stderr.puts "#{srcpath}\tcopied to #{dstpath}"
+				$stderr.puts "#{srcpath}\tcopied to #{dstpath}" unless conf.quiet
 			else
 				$stderr.puts "#{srcpath}\tpretending to copy to #{dstpath}"
 			end
 		else
 			unless conf.dry_run
 				FileUtils.mv(srcpath, dstpath)
-				$stderr.puts "#{srcpath}\tmoved to #{dstpath}"
+				$stderr.puts "#{srcpath}\tmoved to #{dstpath}" unless conf.quiet
 			else
 				$stderr.puts "#{srcpath}\tpretending to move to #{dstpath}"
 			end
 		end
 
 	rescue => evar
-		$stderr.puts "#{srcpath}\t#{$!}"
+		$stderr.puts "#{srcpath}\t#{$!}" unless conf.quiet
 		error = true
 	end
 end
