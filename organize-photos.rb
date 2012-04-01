@@ -102,6 +102,11 @@ opt.parse!(ARGV)
 error = false
 ARGV.each do |srcpath|
 	begin
+		# Check if the source is a file
+		unless File.file?(srcpath)
+			next
+		end
+
 		# Parse EXIF and check timestamp
 		image = Image.new(srcpath)
 		unless image.time
