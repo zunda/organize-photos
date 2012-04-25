@@ -82,11 +82,15 @@ class Conf
 	attr_accessor :moving
 	attr_accessor :dst_format
 	attr_accessor :quiet
+	attr_accessor :include_dir
+	attr_accessor :include_dir_sep
 	def initialize
 		@dry_run = false
 		@moving = false
 		@quiet = false
 		@dst_format = '/backup1/Archive/Photo/Photo%y/%y%m'
+		@include_dir = false
+		@include_dir_sep = '_'
 	end
 end
 
@@ -97,6 +101,7 @@ opt.on('-n', 'makes a dry run'){conf.dry_run = true}
 opt.on('-m', 'moves the files instead of copying'){conf.moving = true}
 opt.on('-d', "specifies format of destination, default: #{conf.dst_format}"){|x| conf.dst_format = x}
 opt.on('-q', "supresses error messages"){conf.quiet = true}
+opt.on('-i', 'include last part of source path directory name to avoid duplicate copies'){conf.include_dir = true}
 opt.parse!(ARGV)
 
 error = false
@@ -119,7 +124,11 @@ srcpaths.each do |srcpath|
 		# Create destination
 		srcname = File.basename(srcpath)
 		dstdir = image.time.strftime(conf.dst_format)
-		dstpath = File.join(dstdir, srcname)
+		if conf.include_dir
+			dstpath = File.join(dstdir, File.basename(File.dirname(srcpath)) + conf.include_dir_sep + srcname)
+		else
+			dstpath = File.join(dstdir, srcname)
+		end
 
 		# Check similar file in destination
 		if File.identical?(srcpath, dstpath)
@@ -149,13 +158,12 @@ end
 
 paths.each_pair.sort_by{|e| e[0]}.each do |dstpath, srcpath|
 	begin
-		# Create the destination
 		dstdir = File.dirname(dstpath)
-		FileUtils.mkdir_p(dstdir)
 
 		# Move or copy the file
 		unless conf.moving
 			unless conf.dry_run
+				FileUtils.mkdir_p(dstdir)
 				FileUtils.cp(srcpath, dstpath, {:preserve => true})
 				$stderr.puts "#{srcpath}\tcopied to #{dstpath}"
 			else
@@ -163,6 +171,7 @@ paths.each_pair.sort_by{|e| e[0]}.each do |dstpath, srcpath|
 			end
 		else
 			unless conf.dry_run
+				FileUtils.mkdir_p(dstdir)
 				FileUtils.mv(srcpath, dstpath)
 				$stderr.puts "#{srcpath}\tmoved to #{dstpath}"
 			else
