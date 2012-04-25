@@ -100,7 +100,10 @@ opt.on('-q', "supresses error messages"){conf.quiet = true}
 opt.parse!(ARGV)
 
 error = false
-ARGV.each do |srcpath|
+srcpaths = ARGV
+
+paths = Hash.new	# key:dst value:src
+srcpaths.each do |srcpath|
 	begin
 		# Check if the source is a file
 		unless File.file?(srcpath)
@@ -117,15 +120,38 @@ ARGV.each do |srcpath|
 		srcname = File.basename(srcpath)
 		dstdir = image.time.strftime(conf.dst_format)
 		dstpath = File.join(dstdir, srcname)
-		FileUtils.mkdir_p(dstdir)
 
 		# Check similar file in destination
 		if File.identical?(srcpath, dstpath)
-			raise "is already in #{dstdir}"
+			raise "is already as #{dstpath}"
 		end
 		if Dir.paths(dstdir).map{|p| File.basename(p).downcase}.include?(srcname.downcase)
 			raise "has similar file below #{dstdir}"
 		end
+
+		# Check duplicate filename
+		if paths.has_key?(dstpath)
+			raise "duplicate copy will be #{dstpath}"
+		end
+
+		# Register the operation
+		paths[dstpath] = srcpath
+
+	rescue => evar
+		$stderr.puts "#{srcpath}\t#{$!}" unless conf.quiet
+		error = true
+	end
+end
+if error
+	$stderr.puts "Terminating before actual operation due to an error"
+	exit 1
+end
+
+paths.each_pair.sort_by{|e| e[0]}.each do |dstpath, srcpath|
+	begin
+		# Create the destination
+		dstdir = File.dirname(dstpath)
+		FileUtils.mkdir_p(dstdir)
 
 		# Move or copy the file
 		unless conf.moving
@@ -149,5 +175,4 @@ ARGV.each do |srcpath|
 		error = true
 	end
 end
-
 exit 1 if error
