@@ -84,6 +84,7 @@ class Conf
 	attr_accessor :quiet
 	attr_accessor :include_dir
 	attr_accessor :include_dir_sep
+	attr_accessor :ignore_errors
 	def initialize
 		@dry_run = false
 		@moving = false
@@ -91,6 +92,7 @@ class Conf
 		@dst_format = '/backup1/Archive/Photo/Photo%y/%y%m'
 		@include_dir = false
 		@include_dir_sep = '_'
+		@ignore_errors = false
 	end
 end
 
@@ -102,6 +104,7 @@ opt.on('-m', 'moves the files instead of copying'){conf.moving = true}
 opt.on('-d', "specifies format of destination, default: #{conf.dst_format}"){|x| conf.dst_format = x}
 opt.on('-q', "supresses error messages"){conf.quiet = true}
 opt.on('-i', 'include last part of source path directory name to avoid duplicate copies'){conf.include_dir = true}
+opt.on('-c', "continue opeartion ignoring errors"){conf.ignore_errors = true}
 opt.parse!(ARGV)
 
 error = false
@@ -151,7 +154,7 @@ srcpaths.each do |srcpath|
 		error = true
 	end
 end
-if error
+if error and not conf.ignore_errors
 	$stderr.puts "Terminating before actual operation due to an error"
 	exit 1
 end
