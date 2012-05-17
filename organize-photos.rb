@@ -137,8 +137,13 @@ srcpaths.each do |srcpath|
 		if File.identical?(srcpath, dstpath)
 			raise "is already as #{dstpath}"
 		end
-		if Dir.paths(dstdir).map{|p| File.basename(p).downcase}.include?(srcname.downcase)
-			raise "has similar file below #{dstdir}"
+		if File.exists?(dstdir)
+			unless File.directory?(dstdir)
+				raise "destination #{dstdir} is not a directory"
+			end
+			if Dir.paths(dstdir).map{|p| File.basename(p).downcase}.include?(srcname.downcase)
+				raise "has similar file below #{dstdir}"
+			end
 		end
 
 		# Check duplicate filename
