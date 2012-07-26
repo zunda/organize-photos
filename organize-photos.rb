@@ -115,7 +115,13 @@ srcpaths.each do |srcpath|
 	begin
 		# Check if the source is a file
 		unless File.file?(srcpath)
+			$stderr.puts "#{srcpath}\tis not a file" unless conf.quiet
 			next
+		end
+
+		# Make sure the file is readable
+		unless File.readable?(srcpath)
+			raise Errno::EACCES
 		end
 
 		# Parse EXIF and check timestamp
