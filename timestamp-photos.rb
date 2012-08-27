@@ -26,13 +26,15 @@ TimeIncrement = 1
 
 class Image
 	DateTag = 'Date and Time (original)'	# in EXIF
+	DateTimeFormat = %r|\A\d{4,4}:\d\d:\d\d [\d ]{2,2}:[\d ]{2,2}:[\d ]{2,2}\z|	# http://www.exif.org/Exif2-2.PDF p.36
+
 	attr_reader :time
 
 	def initialize(path)
 		@time = nil
 		begin
 			x = Exif.new(path)[DateTag]
-			@time = Time.local(*x.scan(/\d+/)) if x
+			@time = Time.local(*x.scan(/\d+/)) if x and x.match(DateTimeFormat)
 		rescue Exif::NotExifFormat
 		rescue ArgumentError
 		end
