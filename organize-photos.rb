@@ -55,7 +55,7 @@ class Image
 			ts << x.scan(/\d+/) if x
 		rescue Exif::NotExifFormat
 		end
-		# them from filename with format yyyymmdd_hhmmss
+		# then from filename with format yyyymmdd_hhmmss
 		a = basename.scan(/(\d{4,4})(\d\d)(\d\d).*(\d\d)(\d\d)(\d\d)/)
 		ts << a[0] if a and 1 == a.size
 		# then from filename with format yyyy-mm-dd-hh-mm-ss
