@@ -18,7 +18,7 @@
 # above copyright notice is included.
 #
 
-require 'exif'	# requires libexif-ruby package
+require 'exif'	# requires ruby-exif package
 require 'fileutils'
 require 'optparse'
 
