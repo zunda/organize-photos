@@ -179,7 +179,7 @@ paths.each_pair.sort_by{|e| e[0]}.each do |dstpath, srcpath|
 		unless conf.moving
 			unless conf.dry_run
 				FileUtils.mkdir_p(dstdir)
-				FileUtils.cp(srcpath, dstpath, {:preserve => true})
+				FileUtils.cp(srcpath, dstpath, preserve: true)
 				$stderr.puts "#{srcpath}\tcopied to #{dstpath}"
 			else
 				$stderr.puts "#{srcpath}\tpretending to copy to #{dstpath}"
