@@ -18,7 +18,6 @@
 # above copyright notice is included.
 #
 
-require 'exif'	# requires ruby-exif package
 require 'fileutils'
 require 'optparse'
 
@@ -39,8 +38,6 @@ class Dir
 end
 
 class Image
-	DateTag = 'Date and Time (original)'	# in EXIF
-	DateTimeFormat = %r|\A\d{4,4}:\d\d:\d\d [\d ]{2,2}:[\d ]{2,2}:[\d ]{2,2}\z|	# http://www.exif.org/Exif2-2.PDF p.36
 	attr_reader :time
 
 	def initialize(path)
@@ -50,13 +47,7 @@ class Image
 
 		ts = Array.new
 
-		# Try to obtain timestamp from EXIF
-		begin
-			x = Exif.new(path)[DateTag]
-			ts << x.scan(/\d+/) if x and x.match(DateTimeFormat)
-		rescue Exif::NotExifFormat
-		end
-		# then from filename with format yyyymmdd_hhmmss
+		# Try to obtain timestamp from filename with format yyyymmdd_hhmmss
 		a = basename.scan(/(\d{4,4})(\d\d)(\d\d).*(\d\d)(\d\d)(\d\d)/)
 		ts << a[0] if a and 1 == a.size
 		# then from filename with format yyyy-mm-dd-hh-mm-ss
