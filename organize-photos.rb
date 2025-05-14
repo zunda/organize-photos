@@ -144,7 +144,7 @@ srcpaths.each do |srcpath|
 		if File.identical?(srcpath, dstpath)
 			raise "is already as #{dstpath}"
 		end
-		if File.exists?(dstdir)
+		if File.exist?(dstdir)
 			unless File.directory?(dstdir)
 				raise "destination #{dstdir} is not a directory"
 			end
