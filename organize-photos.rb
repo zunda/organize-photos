@@ -53,7 +53,7 @@ class Image
 		# https://en.wikipedia.org/wiki/Exif
 		begin
 			x = Exif::Data.new(IO.read(@path, 64*1024))
-			a = x.date_time.scan(/\d+/)
+			a = x.date_time_original.scan(/\d+/)
 			ts << a[0..5] if a and 6 == a.size
 		rescue Exif::NotReadable
 		end
