@@ -20,6 +20,7 @@
 
 require 'fileutils'
 require 'optparse'
+require 'exif'
 
 class Dir
 	def Dir.paths(dirname)
@@ -47,7 +48,16 @@ class Image
 
 		ts = Array.new
 
-		# Try to obtain timestamp from filename with format yyyymmdd_hhmmss
+		# Try to obtain timestamp from EXIF
+		# Exif metadata are restricted in size to 64 kB in JPEG images
+		# https://en.wikipedia.org/wiki/Exif
+		begin
+			x = Exif::Data.new(IO.read(@path, 64*1024))
+			a = x.date_time.scan(/\d+/)
+			ts << a[0..5] if a and 6 == a.size
+		rescue Exif::NotReadable
+		end
+		# then from from filename with format yyyymmdd_hhmmss
 		a = basename.scan(/(\d{4,4})(\d\d)(\d\d).*(\d\d)(\d\d)(\d\d)/)
 		ts << a[0] if a and 1 == a.size
 		# then from filename with format yyyy-mm-dd-hh-mm-ss
